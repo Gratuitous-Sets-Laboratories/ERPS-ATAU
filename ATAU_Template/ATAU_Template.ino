@@ -3,6 +3,7 @@
  * Dallas, TX, USA
  * 
  * ESCAPE ROOM, PALM SPRINGS
+ * Palm Springs, CA, USA
  * 
  * 2022
  */
@@ -23,8 +24,12 @@
   const String verNum = "Alpha";                              // version of sketch
   const String lastUpdate = "2022 Sept";                   // last update
 
-  #define numPISOregs 4                                       // total number of PISO shift registers (data in)
- 
+  const int stationNum = 1;                                   
+  
+  const int serialDelay = 500;
+  
+//  #define numPISOregs 4                                       // total number of PISO shift registers (data in)
+
 //-------------- PIN DEFINITIONS  ----------------------------//
 /* Most of the I/O pins on the Arduino Nano are hard-wired to various components on the ARDNEX2.
  * Pins not used for their standard fuction have header pins for alternate uses.
@@ -56,16 +61,24 @@
 //============== GLOBAL VARIABLES ============================//
 /* Decrlare variables used by various functions.
  */
-  byte npxCmd;
-  byte npxPrev;
-  
-  byte PISOdata[numPISOregs];
-  byte PISOprev[numPISOregs];
+  byte npxCmd;                                                // 0-3 incoming from R.Pi
+  byte npxPrev;                                               // previous loop's command from R.Pi
 
-  byte cableNum[4];
-  byte cablePrev[4];
+  int puzzleID;                                               // the ID number of the selected puzzle
   
-  bool somethingNew;
+//  byte PISOdata[numPISOregs];                                 // raw data from PISO shift registers
+//  byte PISOprev[numPISOregs];                                 // previous loop's raw data
+
+  long commGameRead;
+  long commGamePrev;
+  long commGameAns;
+
+  byte cableNum[4];                                           // the cable/hose hooked up via analaog read
+  byte cablePrev[4];                                          // previous loop's cable numbers
+  byte cableAns[4];                                           //
+  
+  bool somethingNew;                                          // flag to indicate that some input has changed since the last loop
+  bool solved;
 
 //============================================================//
 //============== SETUP =======================================//
@@ -74,13 +87,18 @@
 void setup() {
 
 //-------------- SERIAL MONITOR ------------------------------//
-
+/*
+ * ERPS note:
+ * This is my standard initial report,
+ * so that future me/us knows what sketch was loaded.
+ * This can/will cange for ATAU
+ */
   Serial.begin(19200);                                        // !! Serial monitor must be set to 19200 baud to read feedback !!
   Serial.println();
   Serial.println("Setup initialized.");
   Serial.print(myNameIs);                                     // report the sketch name and last update
   Serial.print(" ver ");
-  Serial.println(versionNum);
+  Serial.println(verNum);
   Serial.print("Last updated on ");
   Serial.println(lastUpdate);
 
@@ -106,6 +124,10 @@ void setup() {
   npxLED.setBrightness(npxBright);
   npxLED.show();
 
+//.............. (Pseudo)Random Seed .........................//
+  randomSeed(analogRead(A7));
+  genPuzzIDAnswer(stationNum);                    // 2 = Life Sup', 3 = Electrical, 4 = Comm
+
 //-------------- A/V FEEDBACK --------------------------------//
 
   Serial.println("READY");
@@ -123,6 +145,18 @@ void loop() {
   readShiftRegisters();
 
   updateSignColor();
+
+  if  (somethingNew){
+    checkProgress(stationNum);
+  }
+
+  if (solved){
+    Serial.print("Win!");
+    delay(serialDelay);
+    Serial.println();
+
+    genPuzzIDAnswer(stationNum);
+  }
 
 //============== ROUTINE MAINTAINENCE ========================//
 
