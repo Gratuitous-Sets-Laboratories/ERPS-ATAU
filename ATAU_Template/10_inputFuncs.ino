@@ -43,15 +43,15 @@ void readAnalogCables(){
 }
 //-------------- Register Inputs -----------------------------//
 
-void readShiftRegisters(){
+void readShiftRegisters(int bitNum){
 
   pulsePin(loadPin);
-  for (int bitPos = 0; bitPos < 25; bitPos++){
+  for (int bitPos = 0; bitPos < bitNum; bitPos++){
     bool bitVal = digitalRead(dataInPin);
-    bitWrite(commGameRead,bitPos,bitVal);
+    bitWrite(PISOregRead,bitPos,bitVal);
     pulsePin(clockPin);
   }
-  if (commGameRead != commGamePrev){
+  if (PISOregRead != PISOregPrev){
     somethingNew = true;
   }
 /*  

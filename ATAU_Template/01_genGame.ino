@@ -55,7 +55,25 @@ void genPuzzIDAnswer(int game){
              //1234512345123451234512345
              //AAAAABBBBBCCCCCDDDDDEEEEE
         };
-      commGameAns = answerList[puzzleID];
+      PISOregAns = answerList[puzzleID];
+      break;
+//------------------------------------------------------------//
+    case 8:                                                   // Cargo
+      byte CargoAnsGrid[36] = {                               // 1 = Grav Lens, 2 = Flux Cap, 3 = Misc Tard, 4 = Anti-Mat
+           //H I R B                                             Heat, Inert, Refrig, Bulk
+        /*1*/1,2,3,4,
+        /*2*/1,4,2,3,
+        /*3*/3,1,2,4,
+        /*4*/4,1,3,2,
+        /*5*/4,2,1,3,
+        /*6*/4,3,1,2,
+        /*7*/2,4,3,1,
+        /*8*/4,3,2,1,
+        /*9*/3,2,4,1
+      };
+      for (int j = 0; j < 4; j++){                            // for each jack in the electrical game...
+        cableAns[j] = CargoAnsGrid[((puzzleID-1*4)+j)];       // slot in the approriate value from the answerGrid
+      }
       break;
   }
   Serial.print("PuzzleID #");

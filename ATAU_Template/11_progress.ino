@@ -28,19 +28,36 @@ void checkProgress(int game){
       break;                                                  // EXIT SWITCH CASE
 //------------------------------------------------------------//
     case 4:                                                   // Communications
-      if (commGameRead < commGamePrev){                       // if the new long is less than the old (active LOWs)... 
+      if (PISOregRead < PISOregPrev){                       // if the new long is less than the old (active LOWs)... 
         Serial.print("Connect.");                              // inform R.Pi of a disconnect
         delay(serialDelay);
         Serial.println();
       }
-      else if (commGameRead > commGamePrev){                  // otherwise, if it's higher...
+      else if (PISOregRead > PISOregPrev){                  // otherwise, if it's higher...
         Serial.print("Disconnect.");                           // inform R.Pi of a disconnect
         delay(serialDelay);
         Serial.println();
       }
-      if (commGameRead != commGameAns){
+      if (PISOregRead != PISOregAns){
         solved = false;
       }
+      break;
+//------------------------------------------------------------//
+    case 8:                                                   // Cargo
+      int cargoStream = PISOregRead % 32768;
+      byte magsInBay[4];
+      for (int b = 0; b < 4; b++){
+        magsInBay[b] = cargoStream % 16;
+        cargoStream = cargoStream >> 4;
+      }
+      for (int b = 0; b < 4; b++){
+        cableNum[b] = 0;
+        if      (magsInBay[b] == 0b1010) cableNum[b] = 1;
+        else if (magsInBay[b] == 0b1001) cableNum[b] = 2;
+        else if (magsInBay[b] == 0b0110) cableNum[b] = 3;
+        else if (magsInBay[b] == 0b0101) cableNum[b] = 4;
+      }
+      
       break;
   }
   if (solved){

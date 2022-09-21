@@ -65,13 +65,10 @@
   byte npxPrev;                                               // previous loop's command from R.Pi
 
   int puzzleID;                                               // the ID number of the selected puzzle
-  
-//  byte PISOdata[numPISOregs];                                 // raw data from PISO shift registers
-//  byte PISOprev[numPISOregs];                                 // previous loop's raw data
 
-  long commGameRead;
-  long commGamePrev;
-  long commGameAns;
+  long PISOregRead;
+  long PISOregPrev;
+  long PISOregAns;
 
   byte cableNum[4];                                           // the cable/hose hooked up via analaog read
   byte cablePrev[4];                                          // previous loop's cable numbers
@@ -128,7 +125,7 @@ void setup() {
   randomSeed(analogRead(A7));
   readNeoPixelCommand();
   readAnalogCables();
-  readShiftRegisters();
+  readShiftRegisters(25);
   cycleReset();
   genPuzzIDAnswer(stationNum);                    // 2 = Life Sup', 3 = Electrical, 4 = Comm
 
@@ -146,7 +143,7 @@ void loop() {
 
   readNeoPixelCommand();
   readAnalogCables();
-  readShiftRegisters();
+  readShiftRegisters(25);
 
   updateSignColor();
 
