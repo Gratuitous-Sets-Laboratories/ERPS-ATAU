@@ -124,8 +124,12 @@ void setup() {
   npxLED.setBrightness(npxBright);
   npxLED.show();
 
-//.............. (Pseudo)Random Seed .........................//
+//............................................................//
   randomSeed(analogRead(A7));
+  readNeoPixelCommand();
+  readAnalogCables();
+  readShiftRegisters();
+  cycleReset();
   genPuzzIDAnswer(stationNum);                    // 2 = Life Sup', 3 = Electrical, 4 = Comm
 
 //-------------- A/V FEEDBACK --------------------------------//
@@ -148,14 +152,14 @@ void loop() {
 
   if  (somethingNew){
     checkProgress(stationNum);
-  }
+  
+    if (solved){
+      Serial.print("Win!");
+      delay(serialDelay);
+      Serial.println();
 
-  if (solved){
-    Serial.print("Win!");
-    delay(serialDelay);
-    Serial.println();
-
-    genPuzzIDAnswer(stationNum);
+      genPuzzIDAnswer(stationNum);
+    }
   }
 
 //============== ROUTINE MAINTAINENCE ========================//
