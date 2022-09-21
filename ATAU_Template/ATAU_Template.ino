@@ -20,15 +20,15 @@
  * Variables using '#define' are defined by hardware, and should be left alone.
  * Variables using 'const' can be changed to tune the puzzle.
  */
-  const String myNameIs = "ATAU_Template";                   // name of sketch
-  const String verNum = "Alpha";                              // version of sketch
-  const String lastUpdate = "2022 Sept";                   // last update
+  const String myNameIs = "ATAU_Template";                    // name of sketch
+  const String verNum = "B1";                                 // version of sketch
+  const String lastUpdate = "2022 Sept";                      // last update
 
   const int stationNum = 1;                                   
   
   const int serialDelay = 500;
   
-//  #define numPISOregs 4                                       // total number of PISO shift registers (data in)
+//  #define numPISOregs 4                                     // total number of PISO shift registers (data in)
 
 //-------------- PIN DEFINITIONS  ----------------------------//
 /* Most of the I/O pins on the Arduino Nano are hard-wired to various components on the ARDNEX2.

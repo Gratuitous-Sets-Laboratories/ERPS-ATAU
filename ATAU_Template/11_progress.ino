@@ -57,7 +57,24 @@ void checkProgress(int game){
         else if (magsInBay[b] == 0b0110) cableNum[b] = 3;
         else if (magsInBay[b] == 0b0101) cableNum[b] = 4;
       }
-      
+      String bayName[4] = {"Heated","Inert","Refrig","Bulk"};
+      for (int b = 0; b < 4; b++){
+        if (cableNum[b] > cablePrev[b]){
+          Serial.print(bayName[b]);
+          Serial.print(" Loaded.");
+          delay (serialDelay);
+          Serial.println();
+        }
+        else if (cableNum[b] < cablePrev[b]){
+          Serial.print(bayName[b]);
+          Serial.print(" Unloaded.");
+          delay (serialDelay);
+          Serial.println();
+        }
+        if (cableNum[b] != cableAns[b]){
+          solved = false;
+        }
+      }
       break;
   }
   if (solved){
