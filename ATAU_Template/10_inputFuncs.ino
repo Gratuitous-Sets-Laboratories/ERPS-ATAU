@@ -48,7 +48,7 @@ void readShiftRegisters(int bitNum){
   pulsePin(loadPin);
   for (int bitPos = 0; bitPos < bitNum; bitPos++){
     bool bitVal = digitalRead(dataInPin);
-    if(stationNum == 4 && bitPos == 15){
+    if(stationNum == 4 && bitPos == 14){
       pulsePin(clockPin);
     }
     bitWrite(PISOregRead,bitPos,bitVal);
