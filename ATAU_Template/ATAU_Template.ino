@@ -21,14 +21,13 @@
  * Variables using 'const' can be changed to tune the puzzle.
  */
   const String myNameIs = "ATAU_Template";                    // name of sketch
-  const String verNum = "B1";                                 // version of sketch
+  const String verNum = "B1.2";                               // version of sketch
   const String lastUpdate = "2022 Sept";                      // last update
 
-  const int stationNum = 1;                                   
+  const int stationNum = 4;                                   // 2 = Life Sup', 3 = Electrical, 4 = Comm, 8 = Cargo    
   
-  const int serialDelay = 500;
-  
-//  #define numPISOregs 4                                     // total number of PISO shift registers (data in)
+  const int serialDelay = 500;                                // length of time before sending a blank line via Serial
+  const int debounceDelay = 50;                               // delay after a "somethingNew" to avoid bouncing comm to R.Pi
 
 //-------------- PIN DEFINITIONS  ----------------------------//
 /* Most of the I/O pins on the Arduino Nano are hard-wired to various components on the ARDNEX2.
@@ -76,6 +75,10 @@
   
   bool somethingNew;                                          // flag to indicate that some input has changed since the last loop
   bool solved;
+
+  //
+  byte PISOdata[3];
+  byte PISOprev[3];
 
 //============================================================//
 //============== SETUP =======================================//
@@ -127,7 +130,7 @@ void setup() {
   readAnalogCables();
   readShiftRegisters(25);
   cycleReset();
-  genPuzzIDAnswer(stationNum);                    // 2 = Life Sup', 3 = Electrical, 4 = Comm
+  genPuzzIDAnswer(stationNum);
 
 //-------------- A/V FEEDBACK --------------------------------//
 
@@ -142,9 +145,17 @@ void setup() {
 void loop() {
 
   readNeoPixelCommand();
-  readAnalogCables();
-  readShiftRegisters(25);
-
+/* Comment out one or both of the below functions as needed by each station. */
+//  readAnalogCables();                                         // used for Life Support & Electrical
+  readShiftRegisters(25);                                     // 25 for Comm, 16 for Cargo
+/*
+  readPISO(0,0);
+  for (int reg = 0; reg <= 0; reg++){
+    if (PISOdata[reg] != PISOprev[reg]){
+      somethingNew = true;
+    }
+  }
+*/
   updateSignColor();
 
   if  (somethingNew){

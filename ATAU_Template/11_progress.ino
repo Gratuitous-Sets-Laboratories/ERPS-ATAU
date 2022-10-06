@@ -2,9 +2,10 @@
 
 void checkProgress(int game){
 
-  switch(game){
+  solved = true;                                              // assume the the player is correct
+  
+  switch(game){                                               // BEGIN SWITCH CASE
 
-    solved = true;                                            // assume the cable positions are correct
 //------------------------------------------------------------//
     case 2:                                                   // Life Support or
     case 3:                                                   // Electrical
@@ -15,7 +16,7 @@ void checkProgress(int game){
           Serial.println();                                   // print a blank line to clear the Serial
         }
         else if (cableNum[j] < cablePrev[j]){                 // otherwise, if the jack has a lower value...
-          Serial.print("Disconnect.");                         // inform R.Pi of a disconnect
+          Serial.print("Disconnect.");                        // inform R.Pi of a disconnect
           delay(serialDelay);
           Serial.println();
         }
@@ -28,13 +29,13 @@ void checkProgress(int game){
       break;                                                  // EXIT SWITCH CASE
 //------------------------------------------------------------//
     case 4:                                                   // Communications
-      if (PISOregRead < PISOregPrev){                       // if the new long is less than the old (active LOWs)... 
-        Serial.print("Connect.");                              // inform R.Pi of a disconnect
+      if (PISOregRead < PISOregPrev){                         // if the new long is less than the old (active LOWs)... 
+        Serial.print("Connect.");                             // inform R.Pi of a disconnect
         delay(serialDelay);
         Serial.println();
       }
-      else if (PISOregRead > PISOregPrev){                  // otherwise, if it's higher...
-        Serial.print("Disconnect.");                           // inform R.Pi of a disconnect
+      else if (PISOregRead > PISOregPrev){                    // otherwise, if it's higher...
+        Serial.print("Disconnect.");                          // inform R.Pi of a disconnect
         delay(serialDelay);
         Serial.println();
       }
@@ -44,8 +45,8 @@ void checkProgress(int game){
       break;
 //------------------------------------------------------------//
     case 8:                                                   // Cargo
-      int cargoStream = PISOregRead % 32768;
-      byte magsInBay[4];
+      uint16_t cargoStream = PISOregRead % 32768;             // make a 16bit copy of the PISOregRead
+      byte magsInBay[4];                                      // the magnetic reads from each bay
       for (int b = 0; b < 4; b++){
         magsInBay[b] = cargoStream % 16;
         cargoStream = cargoStream >> 4;
@@ -76,11 +77,6 @@ void checkProgress(int game){
         }
       }
       break;
-  }
-  if (solved){
-    Serial.print("Win!");
-    delay(serialDelay);
-    Serial.println();
-    
-  }
+//------------------------------------------------------------//
+  }                                                           // END of SWITCH CASE
 }

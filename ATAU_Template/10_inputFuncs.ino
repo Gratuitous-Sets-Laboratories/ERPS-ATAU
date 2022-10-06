@@ -48,6 +48,9 @@ void readShiftRegisters(int bitNum){
   pulsePin(loadPin);
   for (int bitPos = 0; bitPos < bitNum; bitPos++){
     bool bitVal = digitalRead(dataInPin);
+    if(stationNum == 4 && bitPos == 15){
+      pulsePin(clockPin);
+    }
     bitWrite(PISOregRead,bitPos,bitVal);
     pulsePin(clockPin);
   }
@@ -62,4 +65,24 @@ void readShiftRegisters(int bitNum){
     }
   }
 */
+}
+
+//
+
+void readPISO(int fReg, int lReg){
+
+  pulsePin(loadPin);                                       // rend a rising edge signal to load the current data into the registers
+  
+  for (int dumpReg = 0; dumpReg < fReg; dumpReg++){           // for each register before the first one called for...
+    for (int dumpBit = 0; dumpBit < 8; dumpBit++){            // for each bit in that register's byte...
+      pulsePin(clockPin);                                  // pulse the clock pin to skip that bit
+    }
+  }
+  for (int readReg = fReg; readReg < lReg+1; readReg++){      // for each requested register...
+    for (int pos = 0; pos < 8; pos++){                        // for each bit in that register's byte...
+      bool val = digitalRead(dataInPin);                      // read the bit's value from the input pin
+      bitWrite(PISOdata[readReg], pos, val);                  // write it to the approriate position in the appropriate byte
+      pulsePin(clockPin);                                  // pulse the clock pin to advance the next bit
+    }
+  }
 }

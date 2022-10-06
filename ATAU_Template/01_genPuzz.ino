@@ -5,25 +5,26 @@ void genPuzzIDAnswer(int game){
   puzzleID = random(1,10);                                    // pick a number between 1 & 9
   
   switch (game){
+//------------------------------------------------------------//
     case 2:                                                   // Life Support
-      byte LifeAnsGrid[36] = {                                 // 1 = CO2, 2 = Air, 3 = Tank, 4 = Regulator
-        /*1*/1,2,3,4,
-        /*2*/2,1,3,4,
-        /*3*/3,1,4,2,
-        /*4*/3,2,4,1,
-        /*5*/3,4,2,1,
-        /*6*/4,1,2,3,
-        /*7*/4,2,1,3,
-        /*8*/1,4,2,3,
-        /*9*/2,3,1,4
+      int LifeAnsGrid[36] = {                                 // 1 = CO2, 2 = Air, 3 = Tank, 4 = Regulator
+        /*1*/ 1,2,3,4,
+        /*2*/ 2,1,3,4,
+        /*3*/ 3,1,4,2,
+        /*4*/ 3,2,4,1,
+        /*5*/ 3,4,2,1,
+        /*6*/ 4,1,2,3,
+        /*7*/ 4,2,1,3,
+        /*8*/ 1,4,2,3,
+        /*9*/ 2,3,1,4
       };
       for (int j = 0; j < 4; j++){                            // for each jack in the life support game...
-        cableAns[j] = LifeAnsGrid[((puzzleID-1*4)+j)];        // slot in the approriate value from the answerGrid
+        cableAns[j] = LifeAnsGrid[(((puzzleID-1)*4)+j)];      // slot in the approriate value from the answerGrid
       }
       break;
 //------------------------------------------------------------//
     case 3:                                                   // Electrical
-      byte ElecAnsGrid[36] = {                                 // 1 = Main, 2 = Aux, 3 = Reactor, 4 = Cooling
+      byte ElecAnsGrid[36] = {                                // 1 = Main, 2 = Aux, 3 = Reactor, 4 = Cooling
         /*1*/1,2,3,4,
         /*2*/1,4,2,3,
         /*3*/2,3,4,1,
@@ -35,11 +36,26 @@ void genPuzzIDAnswer(int game){
         /*9*/4,1,2,3
       };
       for (int j = 0; j < 4; j++){                            // for each jack in the electrical game...
-        cableAns[j] = ElecAnsGrid[((puzzleID-1*4)+j)];        // slot in the approriate value from the answerGrid
+        cableAns[j] = ElecAnsGrid[(((puzzleID-1)*4)+j)];      // slot in the approriate value from the answerGrid
       }
       break;
 //------------------------------------------------------------//
     case 4:                                                   // Communiucations
+/*
+ * Wiring Hookup to the shift registers...
+ * For the Columns:
+ * Column A is on the red marked ribbon cable, brown-green.
+ * Column B is on the red marked ribbon cable, black-blue.
+ * Column C is on the black marked ribbon cable, brown-green.
+ * Column D is on the black marked ribbon cable, black-blue.
+ * Column E is on the yellow marked half-ribbon cable, brown-green.
+ * For the number rows:
+ * 1 is brown or black
+ * 2 is red or white
+ * 3 is orange or gray
+ * 4 is yellow or purple
+ * 5 is green or blue
+ */
       long answerList[9] = {
              //AAAAABBBBBCCCCCDDDDDEEEEE
              //1234512345123451234512345
@@ -76,9 +92,21 @@ void genPuzzIDAnswer(int game){
       }
       break;
   }
+//------------------------------------------------------------//
   Serial.print("PuzzleID #");
   Serial.print(puzzleID);
   delay(serialDelay);
   Serial.println();
+//  analogAnsReport();                                          // !! for DBTS only !! comment out of final
+}
 
+void analogAnsReport(){
+  Serial.println("Correct Answer as follows:");
+  for (int c = 0; c < 4; c++){
+    Serial.print(cableAns[c]);
+    if (c < 3){
+      Serial.print(" - ");
+    }
+  }
+  Serial.println();
 }
