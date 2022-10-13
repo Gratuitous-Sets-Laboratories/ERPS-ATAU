@@ -20,11 +20,11 @@
  * Variables using '#define' are defined by hardware, and should be left alone.
  * Variables using 'const' can be changed to tune the puzzle.
  */
-  const String myNameIs = "ATAU_Template";                    // name of sketch
-  const String verNum = "B1.2";                               // version of sketch
-  const String lastUpdate = "2022 Sept";                      // last update
+  const String myNameIs = "LifeSupport";                      // name of sketch
+  const String verNum = "1.0";                                // version of sketch
+  const String lastUpdate = "2022 Oct";                       // last update
 
-  const int stationNum = 4;                                   // 2 = Life Sup', 3 = Electrical, 4 = Comm, 8 = Cargo    
+  const int stationNum = 2;                                   // 2 = Life Sup', 3 = Electrical, 4 = Comm, 8 = Cargo    
   
   const int serialDelay = 500;                                // length of time before sending a blank line via Serial
   const int debounceDelay = 50;                               // delay after a "somethingNew" to avoid bouncing comm to R.Pi
@@ -38,7 +38,7 @@
   #define neoPixelPin 5           // data line to WS2812 (NeoPixel) via 470R resistor
 
   const int jackPin[4] = {A0,A1,A2,A3};
-  
+
   #define loadPin     2           // parallel connection to all 74HC165 PISO shift registers, pin 1
   #define dataInPin   3           // serial connection to nearest 74HC165 PISO shift register, pin 9
   #define clockPin    7           // parallel connection to all shift registers (74HC165 pin 2 / 74HC595 pin 11)
@@ -93,7 +93,8 @@ void setup() {
  * so that future me/us knows what sketch was loaded.
  * This can/will cange for ATAU
  */
-  Serial.begin(19200);                                        // !! Serial monitor must be set to 19200 baud to read feedback !!
+  Serial.begin(9600);                                         //
+/*
   Serial.println();
   Serial.println("Setup initialized.");
   Serial.print(myNameIs);                                     // report the sketch name and last update
@@ -101,7 +102,7 @@ void setup() {
   Serial.println(verNum);
   Serial.print("Last updated on ");
   Serial.println(lastUpdate);
-
+*/
 //-------------- PINMODES ------------------------------------//
 
 //.............. NeoPixel Sign Command .......................//
@@ -134,7 +135,11 @@ void setup() {
 
 //-------------- A/V FEEDBACK --------------------------------//
 
-  Serial.println("READY");
+  while(!Serial){}
+  Serial.println("Ready.");
+  delay(serialDelay);
+  Serial.println(puzzleID);
+  delay(serialDelay);
   Serial.println();
 }
 
@@ -146,32 +151,24 @@ void loop() {
 
   readNeoPixelCommand();
 /* Comment out one or both of the below functions as needed by each station. */
-//  readAnalogCables();                                         // used for Life Support & Electrical
-  readShiftRegisters(25);                                     // 25 for Comm, 16 for Cargo
-/*
-  readPISO(0,0);
-  for (int reg = 0; reg <= 0; reg++){
-    if (PISOdata[reg] != PISOprev[reg]){
-      somethingNew = true;
-    }
-  }
-*/
+  readAnalogCables();                                         // used for Life Support & Electrical
+//  readShiftRegisters(25);                                     // 25 for Comm, 16 for Cargo
+
   updateSignColor();
 
   if  (somethingNew){
     checkProgress(stationNum);
   
     if (solved){
-      Serial.print("Win!");
-      delay(serialDelay);
-      Serial.println();
-
-      genPuzzIDAnswer(stationNum);
+      Serial.println("Win.");
+      while(solved){
+                                                              // infinite loop
+      }
     }
   }
 
 //============== ROUTINE MAINTAINENCE ========================//
 
-  dbts();
+//  dbts();
   cycleReset();
 }
