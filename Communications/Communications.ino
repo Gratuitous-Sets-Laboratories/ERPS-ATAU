@@ -167,8 +167,9 @@ void loop() {
   
     if (solved){
       Serial.println("Win.");
-      delay(serialDelay);
-      Serial.println();
+      while(solved){
+                                                              // infinite loop
+      }
 
 //      genPuzzIDAnswer(stationNum);
     }
