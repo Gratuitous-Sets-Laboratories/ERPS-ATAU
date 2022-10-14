@@ -5,20 +5,25 @@
 void checkProgress(int game){
 
   solved = true;                                              // assume the the player is correct
+  String noun;
   
   switch(game){                                               // BEGIN SWITCH CASE
 
 //------------------------------------------------------------//
     case 2:                                                   // Life Support or
+      noun = "Tube ";
     case 3:                                                   // Electrical
+      noun = "Wire ";
       for (int j = 0; j < 4; j++){                            // for each of the 4 jacks...
         if (cableNum[j] > cablePrev[j]){                      // if it's got a higher value than it used to...
-          Serial.print("Connect.");                           // inform R.Pi of a connect
+          Serial.print(noun);
+          Serial.println("Connect.");                         // inform R.Pi of a connect
           delay(serialDelay);                                 // this delay is set in the global constants
           Serial.println();                                   // print a blank line to clear the Serial
         }
         else if (cableNum[j] < cablePrev[j]){                 // otherwise, if the jack has a lower value...
-          Serial.print("Disconnect.");                        // inform R.Pi of a disconnect
+          Serial.print(noun);
+          Serial.println("Disconnect.");                      // inform R.Pi of a disconnect
           delay(serialDelay);
           Serial.println();
         }
@@ -31,13 +36,16 @@ void checkProgress(int game){
       break;                                                  // EXIT SWITCH CASE
 //------------------------------------------------------------//
     case 4:                                                   // Communications
+      noun = "Wire ";
       if (PISOregRead < PISOregPrev){                         // if the new long is less than the old (active LOWs)... 
-        Serial.println("Connect.");                             // inform R.Pi of a disconnect
+        Serial.print(noun);
+        Serial.println("Connect.");                           // inform R.Pi of a disconnect
         delay(serialDelay);
         Serial.println();
       }
       else if (PISOregRead > PISOregPrev){                    // otherwise, if it's higher...
-        Serial.println("Disconnect.");                          // inform R.Pi of a disconnect
+        Serial.print(noun);
+        Serial.println("Disconnect.");                        // inform R.Pi of a disconnect
         delay(serialDelay);
         Serial.println();
       }
@@ -60,17 +68,17 @@ void checkProgress(int game){
         else if (magsInBay[b] == 0b0110) cableNum[b] = 3;
         else if (magsInBay[b] == 0b0101) cableNum[b] = 4;
       }
-      String bayName[4] = {"Heated","Inert","Refrig","Bulk"};
+      String bayName[4] = {"Heat","Inert","Refrig","Bulk"};
       for (int b = 0; b < 4; b++){
         if (cableNum[b] > cablePrev[b]){
           Serial.print(bayName[b]);
-          Serial.print(" Loaded.");
+          Serial.print(" On.");
           delay (serialDelay);
           Serial.println();
         }
         else if (cableNum[b] < cablePrev[b]){
           Serial.print(bayName[b]);
-          Serial.print(" Unloaded.");
+          Serial.print(" Off.");
           delay (serialDelay);
           Serial.println();
         }

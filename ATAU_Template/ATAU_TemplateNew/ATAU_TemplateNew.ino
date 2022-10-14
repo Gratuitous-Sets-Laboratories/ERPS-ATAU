@@ -20,7 +20,7 @@
  * Variables using '#define' are defined by hardware, and should be left alone.
  * Variables using 'const' can be changed to tune the puzzle.
  */
-  const String myNameIs = "Communications";                    // name of sketch
+  const String myNameIs = "ATAU_TemplateNew";                // name of sketch
   const String verNum = "1.0";                               // version of sketch
   const String lastUpdate = "2022 Oct";                      // last update
 
@@ -150,8 +150,8 @@ void loop() {
 
   readNeoPixelCommand();
 /* Comment out one or both of the below functions as needed by each station. */
-//  readAnalogCables();                                         // used for Life Support & Electrical
-  readShiftRegisters(25);                                     // 25 for Comm, 16 for Cargo
+  readAnalogCables();                                         // used for Life Support & Electrical
+//  readShiftRegisters(25);                                     // 25 for Comm, 16 for Cargo
 
   updateSignColor();
 

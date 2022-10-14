@@ -20,7 +20,7 @@
  * Variables using '#define' are defined by hardware, and should be left alone.
  * Variables using 'const' can be changed to tune the puzzle.
  */
-  const String myNameIs = "LifeSupport";                      // name of sketch
+  const String myNameIs = "Electrical";                      // name of sketch
   const String verNum = "1.0";                                // version of sketch
   const String lastUpdate = "2022 Oct";                       // last update
 
