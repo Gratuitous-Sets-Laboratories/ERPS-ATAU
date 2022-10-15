@@ -76,10 +76,6 @@
   bool somethingNew;                                          // flag to indicate that some input has changed since the last loop
   bool solved;
 
-  //
-  byte PISOdata[3];
-  byte PISOprev[3];
-
 //============================================================//
 //============== SETUP =======================================//
 //============================================================//
