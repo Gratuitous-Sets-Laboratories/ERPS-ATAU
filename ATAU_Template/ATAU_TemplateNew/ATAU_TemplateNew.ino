@@ -24,7 +24,7 @@
   const String verNum = "1.0";                               // version of sketch
   const String lastUpdate = "2022 Oct";                      // last update
 
-  const int stationNum = 3;                                   // 2 = Life Sup', 3 = Electrical, 4 = Comm, 8 = Cargo    
+  const int stationNum = 8;                                   // 2 = Life Sup', 3 = Electrical, 4 = Comm, 8 = Cargo    
   
   const int serialDelay = 500;                                // length of time before sending a blank line via Serial
   const int debounceDelay = 50;                               // delay after a "somethingNew" to avoid bouncing comm to R.Pi
@@ -124,14 +124,15 @@ void setup() {
 //............................................................//
   randomSeed(analogRead(A7));
   readNeoPixelCommand();
-  readAnalogCables();
-  readShiftRegisters(25);
+//  readAnalogCables();
+  readShiftRegisters(16);
   cycleReset();
+
   genPuzzIDAnswer(stationNum);
 
 //-------------- A/V FEEDBACK --------------------------------//
 
-  Serial.println("READY");
+  Serial.println("Ready.");
   delay(serialDelay);
   Serial.println(puzzleID);
   delay(serialDelay);
@@ -146,8 +147,8 @@ void loop() {
 
   readNeoPixelCommand();
 /* Comment out one or both of the below functions as needed by each station. */
-  readAnalogCables();                                         // used for Life Support & Electrical
-//  readShiftRegisters(25);                                     // 25 for Comm, 16 for Cargo
+//  readAnalogCables();                                         // used for Life Support & Electrical
+  readShiftRegisters(16);                                     // 25 for Comm, 16 for Cargo
 
   updateSignColor();
 
@@ -156,8 +157,10 @@ void loop() {
   
     if (solved){
       Serial.println("Win.");
-      while(solved){
-                                                              // infinite loop
+      
+      while(solved){                                           // infinite loop
+        readNeoPixelCommand();
+        updateSignColor();
       }
 
 //      genPuzzIDAnswer(stationNum);

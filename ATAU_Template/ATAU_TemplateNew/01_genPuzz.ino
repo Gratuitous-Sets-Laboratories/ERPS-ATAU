@@ -8,24 +8,26 @@ void genPuzzIDAnswer(int game){
   
   switch (game){
 //------------------------------------------------------------//
-    case 2:                                                   // Life Support
-      int LifeAnsGrid[36] = {                                 // 1 = CO2, 2 = Air, 3 = Tank, 4 = Regulator
-        /*1*/ 1,2,3,4,
-        /*2*/ 2,1,3,4,
-        /*3*/ 3,1,4,2,
-        /*4*/ 3,2,4,1,
-        /*5*/ 3,4,2,1,
-        /*6*/ 4,1,2,3,
-        /*7*/ 4,2,1,3,
-        /*8*/ 1,4,2,3,
-        /*9*/ 2,3,1,4
-      };
-      for (int j = 0; j < 4; j++){                            // for each jack in the life support game...
-        cableAns[j] = LifeAnsGrid[(((puzzleID-1)*4)+j)];      // slot in the approriate value from the answerGrid
-      }
-      break;
+//    case 2:                                                   // Life Support
+//     int LifeAnsGrid[36] = {                                 // 1 = CO2, 2 = Air, 3 = Tank, 4 = Regulator
+//        /*1*/ 1,2,3,4,
+//        /*2*/ 2,1,3,4,
+//        /*3*/ 3,1,4,2,
+//        /*4*/ 3,2,4,1,
+//        /*5*/ 3,4,2,1,
+//        /*6*/ 4,1,2,3,
+//        /*7*/ 4,2,1,3,
+//        /*8*/ 1,4,2,3,
+//        /*9*/ 2,3,1,4
+//      };
+//      for (int j = 0; j < 4; j++){                            // for each jack in the life support game...
+//        cableAns[j] = LifeAnsGrid[(((puzzleID-1)*4)+j)];      // slot in the approriate value from the answerGrid
+//      }
+//      break;
+
 //------------------------------------------------------------//
     case 3:                                                   // Electrical
+      Serial.println("test");
       byte ElecAnsGrid[36] = {                                // 1 = Main, 2 = Aux, 3 = Reactor, 4 = Cooling
         /*1*/1,2,3,4,
         /*2*/1,4,2,3,

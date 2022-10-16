@@ -13,7 +13,9 @@ void checkProgress(int game){
     case 2:                                                   // Life Support or
       noun = "Tube ";
     case 3:                                                   // Electrical
-      noun = "Wire ";
+      if (stationNum == 3){
+        noun = "Wire ";
+      }
       for (int j = 0; j < 4; j++){                            // for each of the 4 jacks...
         if (cableNum[j] > cablePrev[j]){                      // if it's got a higher value than it used to...
           Serial.print(noun);

@@ -7,9 +7,9 @@
 void dbts(){
   
   if (somethingNew){
-//    analogReport();
+    analogReport();
 //    gridReport();
-    portList();
+//    portList();
   }
 }
 
@@ -55,15 +55,6 @@ void gridReport(){
     Serial.print(bitVal);
   }
   Serial.println();
-}
-void regCheck(){
-      for (int r = 0; r < 4; r++){
-      Serial.print("Reg# ");
-      Serial.print(r);
-      Serial.print(" ");
-      Serial.println(PISOdata[r],BIN);
-    }
-    Serial.println();
 }
 
 void portList(){
