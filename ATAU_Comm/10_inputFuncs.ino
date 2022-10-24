@@ -18,34 +18,20 @@ void readNeoPixelCommand(){
   }
 }
 
-//-------------- Read Hand Prints ----------------------------//
+//-------------- Register Inputs -----------------------------//
 
-void handPrints(){
+void readShiftRegisters(int bitNum){
 
-  rawData = cap.touched();
-  
-  if (rawData % 4 == 3){
-    handsOn = true;
+  pulsePin(loadPin);
+  for (int bitPos = 0; bitPos < bitNum; bitPos++){
+    bool bitVal = digitalRead(dataInPin);
+    if(stationNum == 4 && bitPos == 14){
+      pulsePin(clockPin);
+    }
+    bitWrite(PISOregRead,bitPos,bitVal);
+    pulsePin(clockPin);
   }
-  else{
-    handsOn = false;
-  }
-
-  if (rawData != rawPrev){
+  if (PISOregRead != PISOregPrev){
     somethingNew = true;
   }
-/*  
-  currtouched = cap.touched();
-  
-  for (uint8_t i=0; i<12; i++) {
-    // it if *is* touched and *wasnt* touched before, alert!
-    if ((currtouched & _BV(i)) && !(lasttouched & _BV(i)) ) {
-      Serial.print(i); Serial.println(" touched");
-    }
-    // if it *was* touched and now *isnt*, alert!
-    if (!(currtouched & _BV(i)) && (lasttouched & _BV(i)) ) {
-      Serial.print(i); Serial.println(" released");
-    }
-  }
-*/  
 }

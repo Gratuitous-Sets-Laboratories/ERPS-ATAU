@@ -5,12 +5,11 @@ void cycleReset(){
 
   npxPrev = npxCmd;
 
-  rawPrev = rawData;
-  handsPrev = handsOn;
+  PISOregPrev = PISOregRead;
 
   if (somethingNew){
     delay(debounceDelay);
   }
-  
+
   somethingNew = false;
 }

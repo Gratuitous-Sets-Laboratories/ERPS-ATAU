@@ -20,9 +20,14 @@
  * Variables using '#define' are defined by hardware, and should be left alone.
  * Variables using 'const' can be changed to tune the puzzle.
  */
-  const String myNameIs = "JustTheLights";                    // name of sketch
+  const String myNameIs = "ATAU_Cargo";                // name of sketch
   const String verNum = "1.0";                               // version of sketch
-  const String lastUpdate = "2022 Oct";                      // last update
+  const String lastUpdate = "2022 Oct 22";                      // last update
+
+  const int stationNum = 8;                                   // 2 = Life Sup', 3 = Electrical, 4 = Comm, 8 = Cargo    
+  
+  const int serialDelay = 500;                                // length of time before sending a blank line via Serial
+  const int debounceDelay = 50;                               // delay after a "somethingNew" to avoid bouncing comm to R.Pi
 
 //-------------- PIN DEFINITIONS  ----------------------------//
 /* Most of the I/O pins on the Arduino Nano are hard-wired to various components on the ARDNEX2.
@@ -31,6 +36,10 @@
 
   const int npxCmdPin[2] = {8,9};
   #define neoPixelPin 5           // data line to WS2812 (NeoPixel) via 470R resistor
+  
+  #define loadPin     2           // parallel connection to all 74HC165 PISO shift registers, pin 1
+  #define dataInPin   3           // serial connection to nearest 74HC165 PISO shift register, pin 9
+  #define clockPin    7           // parallel connection to all shift registers (74HC165 pin 2 / 74HC595 pin 11)
 
 //============== HARDWARE PARAMETERS =========================//
 /*
@@ -52,7 +61,18 @@
   byte npxCmd;                                                // 0-3 incoming from R.Pi
   byte npxPrev;                                               // previous loop's command from R.Pi
 
-  bool somethingNew;
+  int puzzleID;                                               // the ID number of the selected puzzle
+
+  long PISOregRead;
+  long PISOregPrev;
+
+  byte cableNum[4];                                           // the cable/hose hooked up via analaog read
+  byte cablePrev[4];                                          // previous loop's cable numbers
+  byte cableAns[4];                                           //
+    
+  bool somethingNew;                                          // flag to indicate that some input has changed since the last loop
+  bool solved;
+  bool firstLoop = true;
 
 //============================================================//
 //============== SETUP =======================================//
@@ -67,7 +87,8 @@ void setup() {
  * so that future me/us knows what sketch was loaded.
  * This can/will cange for ATAU
  */
-  Serial.begin(9600);                                         //
+  Serial.begin(9600);                                        //
+/*
   Serial.println();
   Serial.println("Setup initialized.");
   Serial.print(myNameIs);                                     // report the sketch name and last update
@@ -75,13 +96,17 @@ void setup() {
   Serial.println(verNum);
   Serial.print("Last updated on ");
   Serial.println(lastUpdate);
-
+*/
 //-------------- PINMODES ------------------------------------//
 
 //.............. NeoPixel Sign Command .......................//
   for (int cmd = 0; cmd < 2; cmd++){
     pinMode (npxCmdPin, INPUT);
   }
+//.............. Shift Registers .............................//
+  pinMode (clockPin, OUTPUT);
+  pinMode (loadPin, OUTPUT);
+  pinMode (dataInPin, INPUT);
 
 //-------------- HARDWARE SETUP ------------------------------//
 
@@ -90,9 +115,24 @@ void setup() {
   npxLED.setBrightness(npxBright);
   npxLED.show();
 
+//-------------- PUZZLE GENERATION ---------------------------//
+
+  randomSeed(analogRead(A7));
+/*
+  solved = true;
+  while(solved){
+    genPuzzIDAnswer();
+    readShiftRegisters(16);
+    checkProgress();
+  }
+*/
 //-------------- A/V FEEDBACK --------------------------------//
 
   Serial.println("Ready.");
+  delay(serialDelay);
+  Serial.print(puzzleID);
+  Serial.println(".");
+  delay(serialDelay);
   Serial.println();
 }
 
@@ -103,11 +143,29 @@ void setup() {
 void loop() {
 
   readNeoPixelCommand();
-
   updateSignColor();
+
+  readShiftRegisters(16);                                     // 25 for Comm, 16 for Cargo
+
+  if  (somethingNew){
+    checkProgress();
+/*  
+    if (solved){
+      Serial.println("Win.");
+      delay(serialDelay);
+      Serial.println();
+      
+      while(1){
+        readNeoPixelCommand();
+        updateSignColor();
+      }
+    }
+ */
+  }
 
 //============== ROUTINE MAINTAINENCE ========================//
 
+  firstLoop = false;
   dbts();
   cycleReset();
 }
