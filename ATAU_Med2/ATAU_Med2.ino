@@ -117,6 +117,7 @@ void setup() {
     while(1);
   }
   Serial.println("Ready.");
+  cap.setThreshholds(9,6);
   delay(serialDelay);
   Serial.println();
 }
@@ -145,7 +146,7 @@ void loop() {
 
 //============== ROUTINE MAINTAINENCE ========================//
 
-//  delay(10);
+  delay(10);
   dbts();
   cycleReset();
 }

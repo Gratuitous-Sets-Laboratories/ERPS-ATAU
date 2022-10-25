@@ -10,7 +10,6 @@ void cycleReset(){
 
   if (somethingNew){
     delay(debounceDelay);
-    Serial.println(rawData%4);
   }
   
   somethingNew = false;
