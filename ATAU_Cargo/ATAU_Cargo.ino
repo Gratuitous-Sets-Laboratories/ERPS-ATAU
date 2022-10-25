@@ -21,8 +21,8 @@
  * Variables using 'const' can be changed to tune the puzzle.
  */
   const String myNameIs = "ATAU_Cargo";                // name of sketch
-  const String verNum = "1.0";                               // version of sketch
-  const String lastUpdate = "2022 Oct 22";                      // last update
+  const String verNum = "1.1";                               // version of sketch
+  const String lastUpdate = "2022 Oct 24";                      // last update
 
   const int stationNum = 8;                                   // 2 = Life Sup', 3 = Electrical, 4 = Comm, 8 = Cargo    
   
@@ -63,8 +63,8 @@
 
   int puzzleID;                                               // the ID number of the selected puzzle
 
-  long PISOregRead;
-  long PISOregPrev;
+  uint16_t PISOregRead;
+  uint16_t PISOregPrev;
 
   byte cableNum[4];                                           // the cable/hose hooked up via analaog read
   byte cablePrev[4];                                          // previous loop's cable numbers
@@ -88,15 +88,7 @@ void setup() {
  * This can/will cange for ATAU
  */
   Serial.begin(9600);                                        //
-/*
-  Serial.println();
-  Serial.println("Setup initialized.");
-  Serial.print(myNameIs);                                     // report the sketch name and last update
-  Serial.print(" ver ");
-  Serial.println(verNum);
-  Serial.print("Last updated on ");
-  Serial.println(lastUpdate);
-*/
+
 //-------------- PINMODES ------------------------------------//
 
 //.............. NeoPixel Sign Command .......................//
@@ -118,14 +110,15 @@ void setup() {
 //-------------- PUZZLE GENERATION ---------------------------//
 
   randomSeed(analogRead(A7));
-/*
+
   solved = true;
   while(solved){
     genPuzzIDAnswer();
+//    analogAnsReport();
     readShiftRegisters(16);
     checkProgress();
   }
-*/
+
 //-------------- A/V FEEDBACK --------------------------------//
 
   Serial.println("Ready.");
@@ -149,7 +142,7 @@ void loop() {
 
   if  (somethingNew){
     checkProgress();
-/*  
+
     if (solved){
       Serial.println("Win.");
       delay(serialDelay);
@@ -160,7 +153,7 @@ void loop() {
         updateSignColor();
       }
     }
- */
+
   }
 
 //============== ROUTINE MAINTAINENCE ========================//

@@ -7,8 +7,9 @@
 void dbts(){
   
   if (somethingNew){
-    analogReport();
-    Serial.println(PISOregRead,BIN);
+//    analogReport();
+//    bayBin();
+//    Serial.println(PISOregRead,BIN);
   }
 }
 
@@ -17,6 +18,17 @@ void analogReport(){
     Serial.print(cableNum[j]);
     if (j < 3){
       Serial.print(" - ");  
+    }
+  }
+  Serial.println();
+}
+
+void bayBin(){
+  for (int b = 0; b < 16; b++){
+    bool bitVal = bitRead(PISOregRead,b);
+    Serial.print(bitVal);
+    if (b%4 == 3){
+      Serial.print(" ");
     }
   }
   Serial.println();
