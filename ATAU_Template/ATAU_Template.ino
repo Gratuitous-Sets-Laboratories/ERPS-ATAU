@@ -87,22 +87,9 @@
 void setup() {
 
 //-------------- SERIAL MONITOR ------------------------------//
-/*
- * ERPS note:
- * This is my standard initial report,
- * so that future me/us knows what sketch was loaded.
- * This can/will cange for ATAU
- */
+
   Serial.begin(9600);                                        //
-/*
-  Serial.println();
-  Serial.println("Setup initialized.");
-  Serial.print(myNameIs);                                     // report the sketch name and last update
-  Serial.print(" ver ");
-  Serial.println(verNum);
-  Serial.print("Last updated on ");
-  Serial.println(lastUpdate);
-*/
+
 //-------------- PINMODES ------------------------------------//
 
 //.............. NeoPixel Sign Command .......................//

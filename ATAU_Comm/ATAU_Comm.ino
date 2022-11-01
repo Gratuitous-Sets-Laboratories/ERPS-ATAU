@@ -24,7 +24,7 @@
   const String verNum = "1.1";                               // version of sketch
   const String lastUpdate = "2022 Oct 24";                      // last update
 
-  const int stationNum = 3;                                   // 2 = Life Sup', 3 = Electrical, 4 = Comm, 8 = Cargo    
+  const int stationNum = 4;                                   // 2 = Life Sup', 3 = Electrical, 4 = Comm, 8 = Cargo    
   
   const int serialDelay = 500;                                // length of time before sending a blank line via Serial
   const int debounceDelay = 50;                               // delay after a "somethingNew" to avoid bouncing comm to R.Pi
@@ -84,6 +84,7 @@ void setup() {
  * so that future me/us knows what sketch was loaded.
  * This can/will cange for ATAU
  */
+
   Serial.begin(9600);                                        //
 
 //-------------- PINMODES ------------------------------------//
@@ -113,6 +114,7 @@ void setup() {
     readShiftRegisters(25);
     checkProgress();
   }
+//-------------- A/V FEEDBACK --------------------------------//
 
   Serial.println("Ready.");
   delay(serialDelay);

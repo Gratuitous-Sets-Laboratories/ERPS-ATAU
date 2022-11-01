@@ -38,6 +38,5 @@ void genPuzzIDAnswer(){
          //1234512345123451234512345
          //AAAAABBBBBCCCCCDDDDDEEEEE
     };
-  PISOregAns = answerList[puzzleID];
-
+  PISOregAns = answerList[puzzleID-1];
 }

@@ -71,7 +71,7 @@ void genPuzzIDAnswer(int game){
              //1234512345123451234512345
              //AAAAABBBBBCCCCCDDDDDEEEEE
         };
-      PISOregAns = answerList[puzzleID];
+      PISOregAns = answerList[puzzleID-1];
       break;
 //------------------------------------------------------------//
     case 8:                                                   // Cargo
