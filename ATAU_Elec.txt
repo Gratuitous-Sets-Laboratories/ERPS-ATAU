@@ -1,0 +1,378 @@
+/*
+ * GRATUITOUS SETS LABORATORIES
+ * Dallas, TX, USA
+ * 
+ * ESCAPE ROOM, PALM SPRINGS
+ * Palm Springs, CA, USA
+ * 
+ * 2022
+ */
+
+//============== DEFINITIONS & DECLAIRATIONS =================//
+
+//-------------- LIBRARIES -----------------------------------//
+/* Call all function libraries required by the sketch. 
+ */
+  #include <Adafruit_NeoPixel.h>  // WS2812 (NeoPixel) addressable LEDs
+  
+//-------------- SETTINGS & GLOBAL CONSTANTS -----------------//
+/* Define constraits used by various functions.
+ * Variables using '#define' are defined by hardware, and should be left alone.
+ * Variables using 'const' can be changed to tune the puzzle.
+ */
+  const String myNameIs = "ATAU_Comm";                    // name of sketch
+  const String verNum = "1.1";                               // version of sketch
+  const String lastUpdate = "2022 Oct 24";                      // last update
+
+  const int stationNum = 3;                                   // 2 = Life Sup', 3 = Electrical, 4 = Comm, 8 = Cargo    
+  
+  const int serialDelay = 500;                                // length of time before sending a blank line via Serial
+  const int debounceDelay = 50;                               // delay after a "somethingNew" to avoid bouncing comm to R.Pi
+
+//-------------- PIN DEFINITIONS  ----------------------------//
+/* Most of the I/O pins on the Arduino Nano are hard-wired to various components on the ARDNEX2.
+ * Pins not used for their standard fuction have header pins for alternate uses.
+ */
+
+  const int npxCmdPin[2] = {8,9};
+  #define neoPixelPin 5           // data line to WS2812 (NeoPixel) via 470R resistor
+  
+  #define loadPin     2           // parallel connection to all 74HC165 PISO shift registers, pin 1
+  #define dataInPin   3           // serial connection to nearest 74HC165 PISO shift register, pin 9
+  #define clockPin    7           // parallel connection to all shift registers (74HC165 pin 2 / 74HC595 pin 11)
+
+//============== HARDWARE PARAMETERS =========================//
+/*
+ * Control basic paramaters for external devices from here.
+ * Pin definitions should be kept above, to insure that there is no overlap.
+ * As with settings & global constants: 
+ * #define refers to installed hardare
+ * const refers to soft settings
+ */
+//.............. WS2812B NeoPixels ...........................//
+  #define numLEDs 24                                          // number of pixels in the daisy chain
+  const int npxBright = 255;                                  // relative brighness of NeoPixels (0-255)
+  Adafruit_NeoPixel npxLED = Adafruit_NeoPixel(               // neoPixel object name
+    numLEDs, neoPixelPin, NEO_GRB + NEO_KHZ800);              // # of pixels, signal pin, type
+
+//============== GLOBAL VARIABLES ============================//
+/* Decrlare variables used by various functions.
+ */
+  byte npxCmd;                                                // 0-3 incoming from R.Pi
+  byte npxPrev;                                               // previous loop's command from R.Pi
+
+  int puzzleID;                                               // the ID number of the selected puzzle
+
+  long PISOregRead;
+  long PISOregPrev;
+  long PISOregAns;                                            //
+  
+  bool somethingNew;                                          // flag to indicate that some input has changed since the last loop
+  bool solved;
+  bool firstLoop = true;
+
+//============================================================//
+//============== SETUP =======================================//
+//============================================================//
+
+void setup() {
+
+//-------------- SERIAL MONITOR ------------------------------//
+/*
+ * ERPS note:
+ * This is my standard initial report,
+ * so that future me/us knows what sketch was loaded.
+ * This can/will cange for ATAU
+ */
+  Serial.begin(9600);                                        //
+
+//-------------- PINMODES ------------------------------------//
+
+//.............. NeoPixel Sign Command .......................//
+  for (int cmd = 0; cmd < 2; cmd++){
+    pinMode (npxCmdPin, INPUT);
+  }
+//.............. Shift Registers .............................//
+  pinMode (clockPin, OUTPUT);
+  pinMode (loadPin, OUTPUT);
+  pinMode (dataInPin, INPUT);
+
+//-------------- HARDWARE SETUP ------------------------------//
+
+//.............. NeoPixels ...................................//
+  npxLED.begin();
+  npxLED.setBrightness(npxBright);
+  npxLED.show();
+
+//............................................................//
+  randomSeed(analogRead(A7));
+  
+  solved = true;
+  while(solved){
+    genPuzzIDAnswer();
+    readShiftRegisters(25);
+    checkProgress();
+  }
+
+  Serial.println("Ready.");
+  delay(serialDelay);
+  Serial.print(puzzleID);
+  Serial.println(".");
+  delay(serialDelay);
+  Serial.println();
+}
+
+//============================================================//
+//============== LOOP ========================================//
+//============================================================//
+
+void loop() {
+
+  readNeoPixelCommand();
+  updateSignColor();
+  
+  readShiftRegisters(25);                                     // 25 for Comm, 16 for Cargo
+
+  if  (somethingNew){
+    checkProgress();
+  
+    if (solved){
+      Serial.println("Win.");
+      
+      while(1){
+        readNeoPixelCommand();
+        updateSignColor();
+      }
+    }
+  }
+
+//============== ROUTINE MAINTAINENCE ========================//
+
+  firstLoop = false;
+  dbts();
+  cycleReset();
+}
+
+//============================================================//
+//============== GENERATE PUZZLE ID & ANSWER =================//
+//============================================================//
+
+void genPuzzIDAnswer(){
+
+  puzzleID = random(1,10);                                    // pick a number between 1 & 9
+  
+
+//------------------------------------------------------------//
+/*
+ * Wiring Hookup to the shift registers...
+ * For the Columns:
+ * Column A is on the red marked ribbon cable, brown-green.
+ * Column B is on the red marked ribbon cable, black-blue.
+ * Column C is on the black marked ribbon cable, brown-green.
+ * Column D is on the black marked ribbon cable, black-blue.
+ * Column E is on the yellow marked half-ribbon cable, brown-green.
+ * For the number rows:
+ * 1 is brown or black
+ * 2 is red or white
+ * 3 is orange or gray
+ * 4 is yellow or purple
+ * 5 is green or blue
+ */
+      long answerList[9] = {
+         //AAAAABBBBBCCCCCDDDDDEEEEE
+         //1234512345123451234512345
+    /*1*/0b1111110100111010100011111,
+    /*2*/0b1110110110111111010101100,
+    /*3*/0b1110101111110100101011011,
+    /*4*/0b1101110011111010011011101,
+    /*5*/0b1101110111101011110001101,
+    /*6*/0b1011001011011111111010011,
+    /*7*/0b1101111011010010001111111,
+    /*8*/0b0111101011101001101110111,
+    /*9*/0b1111001110110010111010111
+         //1234512345123451234512345
+         //AAAAABBBBBCCCCCDDDDDEEEEE
+    };
+  PISOregAns = answerList[puzzleID];
+
+}
+
+//============================================================//
+//============== INPUT FUNCTIONS =============================//
+//============================================================//
+
+//-------------- Read NPX Command ----------------------------//
+
+void readNeoPixelCommand(){
+  
+  npxCmd = 0;                                                 // assume no command
+  
+  for (int pos = 0; pos < 2; pos++){                          // for each bit in the command data...
+    bool bitVal = digitalRead(npxCmdPin[pos]);                // read the approriate pin
+    bitWrite(npxCmd, pos, bitVal);                            // and write that bitVal to the position
+  }
+  
+  if (npxCmd != npxPrev){                                     // if this is different from the last loop
+    somethingNew = true;                                      // raise the somethingNew flag
+  }
+}
+
+//-------------- Register Inputs -----------------------------//
+
+void readShiftRegisters(int bitNum){
+
+  pulsePin(loadPin);
+  for (int bitPos = 0; bitPos < bitNum; bitPos++){
+    bool bitVal = digitalRead(dataInPin);
+    if(stationNum == 4 && bitPos == 14){
+      pulsePin(clockPin);
+    }
+    bitWrite(PISOregRead,bitPos,bitVal);
+    pulsePin(clockPin);
+  }
+  if (PISOregRead != PISOregPrev){
+    somethingNew = true;
+  }
+}
+
+//============================================================//
+//============== MAIN GAME FUNCTIONS =========================//
+//============================================================//
+
+void checkProgress(){
+
+  solved = true;                                              // assume the the player is correct
+  if (!firstLoop){
+    if (PISOregRead < PISOregPrev){                         // if the new long is less than the old (active LOWs)... 
+      Serial.println("Connect.");                             // inform R.Pi of a disconnect
+      delay(serialDelay);
+      Serial.println();
+    }
+    else if (PISOregRead > PISOregPrev){                    // otherwise, if it's higher...
+      Serial.println("Disconnect.");                          // inform R.Pi of a disconnect
+      delay(serialDelay);
+      Serial.println();
+    }
+  }
+  if (PISOregRead != PISOregAns){
+    solved = false;
+  }
+}
+
+//============================================================//
+//============== STATION SIGN UPDATE =========================//
+//============================================================//
+
+//-------------- Update Station Sign -------------------------//
+
+void updateSignColor(){
+  
+  uint32_t signColor [4] = {0,0xFF0000,0x00FF00,0x8888BB};    // hexidecimal sign color for each npxCmd ?0xGGRRBB?
+
+  for ( int pxl = 0; pxl < numLEDs; pxl++){                   // for each pixel in the sign...
+    npxLED.setPixelColor(pxl,signColor[npxCmd]);              // set it to the npxCmd color
+  }
+  npxLED.show();                                              // illuminate the sign
+}
+
+//============================================================//
+//============== SHIFT REGISTER I/O ==========================//
+//============================================================//
+
+/* These functions will read and write via PISO & SIOP shift registers.
+ * They require the global variable byte arrays of:
+ * byte PISOdata[numPISOregs];
+ * 
+ * Devices use 74HC165 PISO registers and 74HC595 SIPO registers.
+ * 
+ * This section updated  Aug 2022
+ */
+
+//-------------- RISING EDGE PUSLE ---------------------------//
+
+/* This function will send a rising edge signal to the designated output pin.
+ * Paramaters required are:
+ * pinName (loadPin, latchPin, clockPin)
+ */
+
+void pulsePin(int pinName){
+  int pulseTime = 10;
+  digitalWrite(pinName, LOW);
+  delayMicroseconds(pulseTime);
+  digitalWrite(pinName, HIGH);
+  delayMicroseconds(pulseTime);
+}
+
+//============================================================//
+//============== DEBUG & TROUBLESHOOT ========================//
+//============================================================//
+/*
+ * This function's call in the vod loop is commented out.
+ */
+void dbts(){
+  
+  if (somethingNew){
+//    portList();
+  }
+}
+
+void gridReport(){
+  Serial.println("GRD\tA\tB\tC\tD\tE");
+  for (int j = 24; j > 19; j--){
+    Serial.print("\t");
+    bool bitVal = bitRead(PISOregRead,j);
+    Serial.print(bitVal);
+  }
+  Serial.println();
+  for (int j = 19; j > 14; j--){
+    Serial.print("\t");
+    bool bitVal = bitRead(PISOregRead,j);
+    Serial.print(bitVal);
+  }
+  Serial.println();
+  for (int j = 14; j > 9; j--){
+    Serial.print("\t");
+    bool bitVal = bitRead(PISOregRead,j);
+    Serial.print(bitVal);
+  }
+  Serial.println();
+  for (int j = 9; j > 4; j--){
+    Serial.print("\t");
+    bool bitVal = bitRead(PISOregRead,j);
+    Serial.print(bitVal);
+  }
+  Serial.println();
+  for (int j = 4; j >= 0; j--){
+    Serial.print("\t");
+    bool bitVal = bitRead(PISOregRead,j);
+    Serial.print(bitVal);
+  }
+  Serial.println();
+}
+
+void portList(){
+  Serial.println("A-A-AB-B-BC-C-CD-D-DE-E-E");
+  Serial.println("1234512345123451234512345");
+  for (int b = 24; b >= 0; b--){
+    bool bitVal = bitRead(PISOregRead,b);
+    Serial.print(bitVal);
+  }
+  Serial.println();
+  Serial.println();
+}
+
+//============================================================//
+//============== CYCLE RESET =================================//
+//============================================================//
+void cycleReset(){
+
+  npxPrev = npxCmd;
+
+  PISOregPrev = PISOregRead;
+
+  if (somethingNew){
+    delay(debounceDelay);
+  }
+
+  somethingNew = false;
+}
